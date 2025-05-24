@@ -4,3 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+fhe_ir = { path = "../fhe_ir" }
+fhe_core = { path = "../fhe_core" }
+

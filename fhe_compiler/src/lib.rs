@@ -1,14 +1,12 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use fhe_ir::Op;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub fn compile_dsl() -> Vec<Op> {
+    vec![
+        Op::Input("x".into()),
+        Op::Input("y".into()),
+        Op::Const(3),
+        Op::Mul("x".into(), "y".into()),               
+        Op::Add("mul_result".into(), "const".into()),   
+        Op::Output("z".into()),
+    ]
 }

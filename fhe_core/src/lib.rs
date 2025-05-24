@@ -1,14 +1,35 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
+use rand;
+
+const Q: i64 = 4096;
+const P: i64 = 17;
+
+pub struct PublicKey {
+    pub pk: i64,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub struct SecretKey {
+    pub sk: i64,
 }
+
+pub fn keygen() -> (PublicKey, SecretKey) {
+    let sk = rand::random_range(100..200); 
+    (PublicKey { pk: sk }, SecretKey { sk })
+}
+
+pub fn encrypt(m: i64, sk: &SecretKey) -> i64 {
+    let r = rand::random_range(1..10);
+    (m + sk.sk * r) % Q
+}
+
+pub fn decrypt(c: &i64, sk: &SecretKey) -> i64 {
+    (c % sk.sk) % P
+}
+
+pub fn homomorphic_add(c1: &i64, c2: &i64) -> i64 {
+    (c1 + c2) % Q
+}
+
+pub fn homomorphic_mul(c1: &i64, c2: &i64) -> i64 {
+    (c1 * c2) % Q
+}
+

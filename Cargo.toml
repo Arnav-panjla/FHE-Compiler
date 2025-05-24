@@ -3,6 +3,7 @@ members = [
     "fhe_core",
     "fhe_ir",
     "fhe_compiler",
-    "fhe_executor",
+    "fhe_executor", 
+    "fhe_driver",
 ]
 
