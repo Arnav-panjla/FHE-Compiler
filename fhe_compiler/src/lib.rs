@@ -6,6 +6,6 @@ use translator::compile_ast;
 use fhe_ir::Op;
 
 pub fn compile_dsl(input: &str) -> Vec<Op> {
-    let ast = parse_dsl(input);
+    let ast = parse_dsl(input).unwrap();
     compile_ast(ast)
 }

@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 fhe_ir = { path = "../fhe_ir" }
+fhe_executor = { path = "../fhe_executor" }
