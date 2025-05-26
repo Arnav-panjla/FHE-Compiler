@@ -7,6 +7,7 @@ pub fn execute(ir: Vec<Op>, inputs: HashMap<String, i64>) -> Option<i64>{
     let mut encrypted_vars: HashMap<String, i64> = HashMap::new();
     let mut const_count = 0;
     let mut output_val = None;
+    let mut temp_count = 0;
 
     for op in ir {
         match op {
@@ -24,16 +25,25 @@ pub fn execute(ir: Vec<Op>, inputs: HashMap<String, i64>) -> Option<i64>{
                 encrypted_vars.insert(name, enc);
             }
             Op::Mul(a, b) => {
-                let r = homomorphic_mul(&encrypted_vars[&a], &encrypted_vars[&b]);
+                let r = homomorphic_mul(
+                    &encrypted_vars.get(&a).expect(&format!("Missing input var {}", a)),
+                    &encrypted_vars.get(&b).expect(&format!("Missing input var {}", b)));
                 println!("Encrypted({}) * Encrypted({}) -> {:?}", a, b, r);
-                encrypted_vars.insert("mul_result".into(), r);
+                let name = format!("t_{}", temp_count);
+                temp_count += 1;
+                encrypted_vars.insert(name, r);
             }
             Op::Add(a, b) => {
-                let r = homomorphic_add(&encrypted_vars[&a], &encrypted_vars[&b]);
-                println!("Encrypted({}) + Encrypted({}) -> {:?}", a, b, r);
-                encrypted_vars.insert("add_result".into(), r);
+                let r = homomorphic_add(
+                    &encrypted_vars.get(&a).expect(&format!("Missing input var {}", a)),
+                    &encrypted_vars.get(&b).expect(&format!("Missing input var {}", b)));
+                println!("Encrypted({}) + Encrypted({}) -> {:?}", a, b, r); 
+                let name = format!("t_{}", temp_count);
+                temp_count += 1;
+                encrypted_vars.insert(name, r);
             }
             Op::Output(name) => {
+                // let local_name = format!("t_1");
                 let val = decrypt(encrypted_vars.get(&name).expect("Missing output var"), &sk);
                 println!("\n[OUTPUT] {} = {}", name, val);
                 output_val = Some(val);
@@ -71,7 +81,7 @@ mod tests {
             Op::Input("a".to_string()),
             Op::Input("b".to_string()),
             Op::Add("a".to_string(), "b".to_string()),
-            Op::Output("add_result".to_string()),
+            Op::Output("t_0".to_string()),
         ];
 
         let result = execute(ops, inputs);
@@ -88,7 +98,7 @@ mod tests {
             Op::Input("a".to_string()),
             Op::Input("b".to_string()),
             Op::Mul("a".to_string(), "b".to_string()),
-            Op::Output("mul_result".to_string()),
+            Op::Output("t_0".to_string()),
         ];
 
         let result = execute(ops, inputs);
@@ -118,11 +128,31 @@ mod tests {
             Op::Const(3),
             Op::Mul("x".to_string(), "const_0".to_string()),
             Op::Const(2),
-            Op::Add("mul_result".to_string(), "const_1".to_string()),
-            Op::Output("add_result".to_string()),
+            Op::Add("t_0".to_string(), "const_1".to_string()),
+            Op::Output("t_1".to_string()),
         ];
 
         let result = execute(ops, inputs);
         assert_eq!(result, Some(17));
+    }
+
+    #[test]
+    fn test_actual_program() {
+
+        let mut inputs = HashMap::new();
+        inputs.insert("x".to_string(), 5);
+        inputs.insert("y".to_string(), 3);
+
+        let ops = vec![
+            Op::Input("x".to_string()),
+            Op::Input("y".to_string()),
+            Op::Mul("x".to_string(), "y".to_string()),
+            Op::Const(3),
+            Op::Add("t_0".to_string(), "const_0".to_string()),
+            Op::Output("t_1".to_string()),
+        ];
+
+        let result = execute(ops, inputs);
+        assert_eq!(result, Some(18));
     }
 }
