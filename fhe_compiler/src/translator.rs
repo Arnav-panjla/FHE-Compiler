@@ -32,7 +32,7 @@ pub fn compile_ast(ast: Statement) -> Vec<Op> {
             Expr::Mul(a, b) => {
                 let a_name = compile_expr(*a, ops, inputs, const_id, temp_id);
                 let b_name = compile_expr(*b, ops, inputs, const_id, temp_id);
-                let name = format!("t{}", *temp_id);
+                let name = format!("t_{}", *temp_id);
                 *temp_id += 1;
                 ops.push(Op::Mul(a_name.clone(), b_name.clone()));
                 name
@@ -40,7 +40,7 @@ pub fn compile_ast(ast: Statement) -> Vec<Op> {
             Expr::Add(a, b) => {
                 let a_name = compile_expr(*a, ops, inputs, const_id, temp_id);
                 let b_name = compile_expr(*b, ops, inputs, const_id, temp_id);
-                let name = format!("t{}", *temp_id);
+                let name = format!("t_{}", *temp_id);
                 *temp_id += 1;
                 ops.push(Op::Add(a_name.clone(), b_name.clone()));
                 name
@@ -49,8 +49,7 @@ pub fn compile_ast(ast: Statement) -> Vec<Op> {
     }
 
     let result_var = compile_expr(ast.expr, &mut ops, &mut inputs, &mut const_id, &mut temp_id);
-    println!("Result variable: {:?}", result_var);
-    ops.push(Op::Output(ast.var));
+    ops.push(Op::Output(result_var));
     println!("Ops: {:?}", ops);
     ops
 }
@@ -58,8 +57,6 @@ pub fn compile_ast(ast: Statement) -> Vec<Op> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fhe_executor::execute;
-    use std::collections::HashMap;
 
     #[test]
     fn test_simple_variable() {
