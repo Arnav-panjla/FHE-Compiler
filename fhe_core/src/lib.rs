@@ -21,13 +21,13 @@ pub fn keygen() -> (PublicKey, SecretKey) {
     (PublicKey { pk: T }, SecretKey { sk: T })
 }
 
-pub fn encrypt(m: i64, sk: &SecretKey) -> i64 {
+pub fn encrypt(m: i64, _sk: &SecretKey) -> i64 {
     let r = rand::random_range(1..10);
     //(m + sk.sk * r) % Q
     m + r * T
 }
 
-pub fn decrypt(c: &i64, sk: &SecretKey) -> i64 {
+pub fn decrypt(c: &i64, _sk: &SecretKey) -> i64 {
     // (c % sk.sk) % P
     c % T
 }

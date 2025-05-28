@@ -1,4 +1,3 @@
-use fhe_ir::Op;
 use std::iter::Peekable;
 use std::str::Chars;
 

@@ -1,6 +1,5 @@
 use fhe_ir::Op;
 use crate::parser::{Expr, Statement};
-use std::collections::HashSet;
 
 pub fn compile_ast(ast: Statement) -> Vec<Op> {
     let mut ops = Vec::new();
